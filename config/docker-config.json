@@ -1,0 +1,8 @@
+{
+  "proxies": {
+    "default": {
+      "httpProxy": "http://host.docker.internal",
+      "httpsProxy": "http://host.docker.internal"
+    }
+  }
+}

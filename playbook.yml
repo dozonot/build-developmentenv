@@ -1,0 +1,120 @@
+---
+- hosts: all
+  tasks:
+  - name: Copy /etc/sudoers
+    become: yes
+    copy:
+      src: config/sudoers
+      dest: /etc/sudoers
+      mode: 0440
+      backup: yes
+
+  - name: Install NTP daemon
+    become: yes
+    apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - ntp 
+
+  - name: Enable ntp
+    become: yes
+    systemd:
+      name: ntp.service
+      state: started
+      daemon_reload: yes
+      enabled: yes
+
+  - name: Copy ntp.conf
+    become: yes
+    copy:
+      src: config/ntp.conf
+      dest: /etc/ntp.conf
+      mode: 0644
+      backup: yes
+
+  - name: Create a symbolic link for JST
+    become: yes
+    file:
+      src: /usr/share/zoneinfo/Asia/Tokyo
+      dest: /etc/localtime
+      owner: root
+      group: root
+      state: link
+
+  - name: Install Docker requirement packages
+    become: yes
+    apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+
+  - name: Add Docker GPG-Key
+    become: yes
+    apt_key:
+      url: https://download.docker.com/linux/gpg
+      state: present
+ 
+  - name: Add apt repository
+    become: yes
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu    bionic    stable
+      state: present
+
+  - name: Create Docker daemon proxy file directory
+    become: yes
+    file:
+      path=/etc/systemd/system/docker.service.d/
+      state=directory
+      owner=root
+      group=root
+      mode=0744
+
+  - name: Copy Docker daemon proxy file
+    become: yes
+    copy:
+      src: config/http-proxy.conf
+      dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+      mode: 0644
+      backup: yes
+
+  - name: Copy Docker client proxy file
+    become: yes
+    copy:
+      src: config/docker-config.json
+      dest: /etc/docker-config.json
+      mode: 0644
+      backup: yes
+
+  - name: Copy /etc/profile
+    become: yes
+    copy:
+      src: config/profile
+      dest: /etc/profile
+      mode: 0644
+      backup: yes
+
+  - name: Install Docker CE
+    become: yes
+    apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+  - name: Add current user to docker group
+    become: yes
+    user: name={{ lookup('env','USER') }} groups="adm,cdrom,sudo,dip,plugdev,docker"
