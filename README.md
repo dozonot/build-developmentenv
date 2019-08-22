@@ -1,8 +1,9 @@
-# ansible-os-setup
+# Ubuntuの開発環境構築を手伝って！
 
 ## このリポジトリについて
 
 このリポジトリはインフラ勉強会で開催された「Ubuntuの開発環境構築を手伝って！」用のリポジトリです。
+
 Ref: [Google Slide](https://docs.google.com/presentation/d/1J-izPPRO2L8ktKaEguczFNBYPEy46JR9V2rV9g4hh-k/edit?usp=sharing)
 
 利用は自己責任でお願いいたします。
