@@ -44,6 +44,24 @@
       group: root
       state: link
 
+  - name: Install Squid
+    become: yes
+    apt:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - squid
+
+  - name: Copy squid.conf
+    become: yes
+    copy:
+      src: config/squid.conf
+      dest: /etc/squid/squid.conf
+      mode: 0644
+      backup: yes
+
   - name: Install Docker requirement packages
     become: yes
     apt:
@@ -84,14 +102,6 @@
     copy:
       src: config/http-proxy.conf
       dest: /etc/systemd/system/docker.service.d/http-proxy.conf
-      mode: 0644
-      backup: yes
-
-  - name: Copy Docker client proxy file
-    become: yes
-    copy:
-      src: config/docker-config.json
-      dest: /etc/docker-config.json
       mode: 0644
       backup: yes
 
